@@ -38,6 +38,7 @@ noteRoutes.route('/').get(function(req, res) {
       console.error(err);
       res.status(400).send('Error: Retrieving notes failed');
     } else {
+        console.log("returning... ", notes);
       res.json({ status: 'SUCCESS', data: notes });
     }
   });
