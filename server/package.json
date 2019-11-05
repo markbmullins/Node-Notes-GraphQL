@@ -2,7 +2,7 @@
   "name": "node-notes-backend",
   "version": "1.0.0",
   "description": "A backend for Node Notes.",
-  "main": "index.js",
+  "main": "app.js",
   "repository": "https://github.com/markbmullins/Node-Notes",
   "author": "Mark Mullins",
   "license": "MIT",
@@ -12,5 +12,8 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "mongoose": "^5.7.7"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.4"
   }
 }
