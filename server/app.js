@@ -38,8 +38,11 @@ noteRoutes.route('/').get(function(req, res) {
             console.error(err);
             res.status(400).send('Error: Retrieving notes failed');
         } else {
-            console.log(notes); 
-            console.log("Returning notes with ids: \n", notes.map(note => note.id));
+            console.log(notes);
+            console.log(
+                'Returning notes with ids: \n',
+                notes.map(note => note.id)
+            );
             res.json(notes);
         }
     });
@@ -62,27 +65,33 @@ noteRoutes.route('/:id').get(function(req, res) {
 // Update
 noteRoutes.route('/:id').put(function(req, res) {
     const { id } = req.params;
-    Note.findById(id, function(err, note) {
-        const { title, content } = req.body;
-        if (!note) {
-            console.error(err);
-            res.status(404).send(`Error: Note ${id} cannot be found`);
-        } else {
-            note.title = title;
-            note.content = content;
-            console.log(`Saving note with id: ${note.id}...`);
-            note.save()
-                .then(note => {
-                    console.log(`Saved note with id: ${note.id}.`);
-                    res.json(note);
-                })
-                .catch(err => {
-                    res.status(400).send(
-                        `Error: Update of note ${req.params.id} failed`
-                    );
-                });
-        }
-    });
+    console.log(id);
+    if (mongoose.Types.ObjectId.isValid(id)) {
+        console.log(`Attempting to update note with id: ${id}`);
+        Note.findById(id, function(err, note) {
+            const { title, content } = req.body;
+            if (!note) {
+                console.error(err);
+                res.status(404).send(`Error: Note ${id} cannot be found`);
+            } else {
+                note.title = title;
+                note.content = content;
+                console.log(`Saving note with id: ${note.id}...`);
+                note.save()
+                    .then(note => {
+                        console.log(`Saved note with id: ${note.id}.`);
+                        res.json(note);
+                    })
+                    .catch(err => {
+                        res.status(400).send(
+                            `Error: Update of note ${req.params.id} failed`
+                        );
+                    });
+            }
+        });
+    } else {
+        console.log('Attempted to save with invalid ID');
+    }
 });
 
 // Delete

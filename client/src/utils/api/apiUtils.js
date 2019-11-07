@@ -1,24 +1,29 @@
-import axios from "axios";
-import { apiURL } from "../config";
+import axios from 'axios';
+import { apiURL } from '../config';
 
-const notesURL = apiURL + "/notes";
+const notesURL = apiURL + '/notes';
 
 export const getNote = id => {
-  return axios.get(`${notesURL}/${id}`);
+    console.log(`Called getNote API call with id: ${id}.`);
+    return axios.get(`${notesURL}/${id}`);
 };
 
 export const getAllNotes = () => {
-  return axios.get(notesURL);
+    console.log('Called getAllNotes API call.');
+    return axios.get(notesURL);
 };
 
 export const createNote = note => {
-  return axios.post(notesURL, note);
+    console.log(`Called createNote API call with note: ${note}.`);
+    return axios.post(notesURL, note);
 };
 
 export const updateNote = note => {
-  return axios.put(`${notesURL}/${note.id}`, note);
+    console.log(`Called updateNote API call with id: ${note._id}.`);
+    return axios.put(`${notesURL}/${note._id}`, note);
 };
 
 export const deleteNote = id => {
-  return axios.delete(`${notesURL}/${id}`);
+    console.log(`Called deleteNote API call with id: ${id}.`);
+    return axios.delete(`${notesURL}/${id}`);
 };

@@ -1,0 +1,36 @@
+.flex-row {
+    display:flex;
+    flex-direction: row;
+    align-content: center;
+}
+
+.full-window {
+    height: 100vh;
+    width:100vw;
+}
+
+.border-solid {
+    border-right: 1px solid #393e46;
+}
+
+.half-window {
+    width: 50%
+}
+
+.third-window {
+    width: 33%;
+}
+
+.content-input {
+    width: 100%;
+    height: 300px;
+    background-color: inherit;
+    color:inherit;
+}
+
+.title-input {
+    width: 100%;
+    background-color: inherit;
+    color: white;
+    font-size: 2em;
+}
