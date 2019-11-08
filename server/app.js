@@ -96,8 +96,9 @@ noteRoutes.route('/:id').put(function(req, res) {
 
 // Delete
 noteRoutes.route('/:id').delete(function(req, res) {
-    const { id } = req.params;
-    console.log(`Deleting note with id: ${note.id}...`);
+    console.log(req)
+    const id = req.params.id;
+    console.log(`Deleting note with id: ${id}...`);
     Note.findByIdAndDelete(id, function(err, note) {
         if (!note) {
             res.status(400).send(`Error: Deleting note ${id} failed`);
