@@ -112,7 +112,7 @@ const Notes = () => {
                     <div className="notes-panel">
                         <div className="flex-row">
                             <div className="title underlined">Notes:</div>
-                            <div className="layout-switcher">Layout</div>
+                            {/* <div className="layout-switcher">Layout</div> */}
                         </div>
 
                         {loading ? (
