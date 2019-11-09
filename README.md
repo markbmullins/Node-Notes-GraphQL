@@ -14,8 +14,9 @@ them to show the state is maintained.
 
 
 
-The back-end uses Express routes and Mongoose to handle CRUD Operations,
-```
+The back-end uses Express routes and Mongoose to handle CRUD Operations, 
+
+```js
 
 // Create
 noteRoutes.route('/').post(function(req, res) {
@@ -114,7 +115,7 @@ noteRoutes.route('/:id').delete(function(req, res) {
 
 The front-end uses axios for HTTP requests to the backend,
 
-```
+```js
 
 export const getNote = id => {
     console.log(`Called getNote API call with id: ${id}.`);
@@ -145,7 +146,7 @@ export const deleteNote = id => {
 
 and React Hooks to handle fetching data.
 
-```
+```js
 
     // Get all notes on initial render;
     useEffect(() => {
