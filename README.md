@@ -1,4 +1,11 @@
 # Node-Notes
+
+
+***
+In Progress: I am currently converting this repo from REST to GraphQL.
+***
+
+
 A MERN markdown note taking app that is build on React, Express, Node and 
 MongoDB. It uses a REST backend for CRUD operations on notes.
 
