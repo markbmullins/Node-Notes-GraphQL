@@ -1,14 +1,16 @@
 {
-  "name": "node-notes-backend",
+  "name": "node-notes",
   "version": "1.0.0",
-  "description": "A backend for Node Notes.",
-  "main": "app.js",
+  "description": "A markdown notetaking app built with MERN",
+  "main": "server/app.js",
   "repository": "https://github.com/markbmullins/Node-Notes",
   "author": "Mark Mullins",
   "license": "MIT",
   "private": true,
   "scripts" : {
-    "prettier": "prettier --write '**/*.{ts,js,css,html}'"
+    "prettier": "prettier --write '**/*.{ts,js,css,html}'",
+    "heroku-postbuild": "npm run build",
+    "start": "nodemon"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
@@ -18,5 +20,6 @@
   },
   "devDependencies": {
     "nodemon": "^1.19.4"
-  }
+  },
+  "homepage": "https://github.com/markbmullins/Node-Notes/blob/master/README.md"
 }
