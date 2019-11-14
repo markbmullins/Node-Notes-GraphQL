@@ -13,11 +13,10 @@ const root = {
   }
 };
 
-app.use(
-    "/graphql",
-    graphqlHTTP({
-      schema: schema,
-      rootValue: root,
-      graphiql: true
-    })
-  );
+const graphql = graphqlHTTP({
+  schema,
+  rootValue: root,
+  graphiql: true,
+});
+
+module.exports = graphql;
