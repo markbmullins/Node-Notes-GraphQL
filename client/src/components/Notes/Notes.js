@@ -19,6 +19,7 @@ const Notes = () => {
     useEffect(() => {
         setLoading(true);
         getAllNotes().then(resp => {
+            console.log(resp)
             setNotes(resp.data);
             if (resp.data && resp.data[0]) {
                 const firstNote = resp.data[0];
