@@ -18,26 +18,35 @@ panel where you can see how your note looks when parsed.
 
 ### Install mongo
 `brew install mongodb`
+
 `mkdir -p /data/db`
+
 `mongod` to start daemon
+
 in a second terminal: `mongo` `use notes`
 
 
 ### Clone repo
 `git clone https://github.com/markbmullins/Node-Notes.git`
+
 `cd Node-Notes`
 
 ### Server
 `yarn install`
+
 `nodemon`
 
 The server is now running on port 3001 and will hot reload.
 
 ### Client
 In another terminal: 
+
 `cd Node-Notes`
+
 `cd client`
+
 `yarn install`
+
 `yarn start`
 
 The client is now running on localhost:3000.
