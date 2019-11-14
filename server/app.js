@@ -21,7 +21,7 @@ if (SHOULD_CONNECT_TO_DB) {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/', indexController);
 
