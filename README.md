@@ -1,14 +1,9 @@
 # Node-Notes
 
-
-***
-In Progress: I am currently converting this repo from REST to GraphQL.
-***
-
 ## About  
 
 A MERN markdown note taking app that is build on React, Express, Node and 
-MongoDB. It uses a REST backend for CRUD operations on notes.
+MongoDB. It can handle CRUD operations with REST or GraphQL.
 
 It has three panels, a notes panel in which you can select or delete notes, or
 create new notes, an editing panel where you can edit the title and content of
@@ -60,7 +55,46 @@ them to show the state is maintained.
 
 ## GraphQL  
 
+Schema:
+
+```js
+
+`
+      type Note {
+        id: ID
+        title: String
+        content: String
+      }
+
+      type Query {
+          getNote(id: ID!): Note
+          getNotes: [Note]
+      }
+
+      type Mutation {
+          createNote(title: String!, content: String): Note
+          updateNote(id: ID!, title: String!, content: String): Note
+          deleteNote(id: ID!): Boolean
+      }
+  `
+
 ```
+
+Resolvers:
+
+```js
+
+    getNotes: noteService.getAll(),
+    getNote: ({id}) => noteService.getByID(id),
+    createNote: ({title, content}) => noteService.create(title, content).then(note => note),
+    updateNote: ({id, title, content}) => noteService.update(id, title, content).then(note => note),
+    deleteNote: ({id}) => noteService.deleteById(id).then(note => note ? true : false)
+
+```
+
+Example queries and return data:
+
+```js
 
 {
   note(id:"5dcc655b86d69d20ba3aecbd") {
@@ -72,7 +106,7 @@ them to show the state is maintained.
 
 ```
 
-```
+```js
 
 {
   "data": {
@@ -86,7 +120,7 @@ them to show the state is maintained.
 
 ```
 
-```
+```js
 
 {
   notes {
@@ -98,7 +132,7 @@ them to show the state is maintained.
 
 ```
 
-```
+```js
 
 {
   "data": {
@@ -141,99 +175,160 @@ The back-end also contains REST routes.
 ```js
 
 // Create
-noteRoutes.route('/').post(function(req, res) {
-    let note = new Note(req.body);
-    note.save()
+router.route('/').post(function(req, res) {
+    const note = req.body;
+    noteService
+        .create(note)
         .then(note => {
-            console.log(`Created note with id: ${note.id}`);
             res.status(200).json(note);
         })
         .catch(err => {
-            console.error(err);
-            res.status(400).send('Error: Adding new note failed');
+            handleError(res, err);
         });
 });
 
 // Read all
-noteRoutes.route('/').get(function(req, res) {
-    Note.find({}, function(err, notes) {
-        if (err) {
-            console.error(err);
-            res.status(400).send('Error: Retrieving notes failed');
-        } else {
-            console.log(notes);
-            console.log(
-                'Returning notes with ids: \n',
-                notes.map(note => note.id)
-            );
-            res.json(notes);
-        }
-    });
+router.route('/').get(function(req, res) {
+    noteService
+        .getAll()
+        .then(notes => {
+            res.status(200).json(notes);
+        })
+        .catch(err => {
+            handleError(res, err);
+        });
 });
 
 // Read one
-noteRoutes.route('/:id').get(function(req, res) {
+router.route('/:id').get(function(req, res) {
     const { id } = req.params;
-    Note.findById(id, function(err, note) {
-        if (err) {
-            console.error(err);
-            res.status(400).send(`Error: Retrieving note ${id} failed`);
-        } else {
-            console.log(`Returning note with id: ${note.id}`);
-            res.json(note);
-        }
-    });
+    noteService
+        .getByID(id)
+        .then(note => {
+            res.status(200).json(note);
+        })
+        .catch(err => {
+            handleError(res, err);
+        });
 });
 
 // Update
-noteRoutes.route('/:id').put(function(req, res) {
-    const { id } = req.params;
-    console.log(id);
-    if (mongoose.Types.ObjectId.isValid(id)) {
-        console.log(`Attempting to update note with id: ${id}`);
-        Note.findById(id, function(err, note) {
-            const { title, content } = req.body;
-            if (!note) {
-                console.error(err);
-                res.status(404).send(`Error: Note ${id} cannot be found`);
-            } else {
-                note.title = title;
-                note.content = content;
-                console.log(`Saving note with id: ${note.id}...`);
-                note.save()
-                    .then(note => {
-                        console.log(`Saved note with id: ${note.id}.`);
-                        res.json(note);
-                    })
-                    .catch(err => {
-                        res.status(400).send(
-                            `Error: Update of note ${req.params.id} failed`
-                        );
-                    });
-            }
+router.route('/:id').put(function(req, res) {
+    const note = req.body;
+    noteService
+        .update(note)
+        .then(note => {
+            res.json(note);
+        })
+        .catch(err => {
+            handleError(res, err);
         });
-    } else {
-        console.log('Attempted to save with invalid ID');
-    }
 });
 
 // Delete
-noteRoutes.route('/:id').delete(function(req, res) {
-    console.log(req)
-    const id = req.params.id;
-    console.log(`Deleting note with id: ${id}...`);
-    Note.findByIdAndDelete(id, function(err, note) {
-        if (!note) {
-            res.status(400).send(`Error: Deleting note ${id} failed`);
-        } else {
-            console.log(`Deleted note with id: ${note.id}.`);
+router.route('/:id').delete(function(req, res) {
+    const { id } = req.params;
+    noteService
+        .deleteById(id)
+        .then(note => {
             res.status(200).json(note);
-        }
-    });
+        })
+        .catch(err => {
+            handleError(res, err);
+        });
 });
 
 ```
 
+
+Service Layer:
+
+The service layer sits between the controllers and the Note repository. Create
+and update can accept either a note object or individual note properties.
+
+
+```js
+
+const create = (...args) => {
+    if(!args || args.length === 0) return null;
+    if(args.length === 1) return noteRepository.create(args[0]);
+    if(args.length === 2) return noteRepository.create({title: args[0], content: args[1]});
+};
+
+const getAll = () => {
+    return noteRepository.getAll();
+};
+
+const getByID = id => {
+    return noteRepository.getByID(id);
+};
+
+const update = (...args) => {
+    if(!args || args.length === 0) return null;
+    if(args.length === 1) return noteRepository.update(args[0]);
+    if(args.length === 3) return noteRepository.update({_id: args[0], title: args[1], content:args[2]});
+};
+
+const deleteById = id => {
+    return noteRepository.deleteById(id);
+};
+
+const validateId = id => {
+    return noteRepository.validateId(id);
+};
+
+```
+
+Repository Layer:
+
+The repository layer handles Mongoose queries and returns promises using `.exec()`
+
+```js
+
+const create = note => {
+    let noteObj = new Note(note);
+    return noteObj.save();
+};
+
+const getAll = () => {
+    return Note.find({}).exec();
+};
+
+const getByID = id => {
+    return Note.findById(id).exec();
+};
+
+const update = note => {
+    const { title, content } = note;
+    return Note.findById(note._id)
+        .exec()
+        .then(note => {
+            note.title = title;
+            note.content = content;
+            return note.save();
+        });
+};
+
+const deleteById = id => {
+    return Note.findByIdAndDelete(id).exec();
+};
+
+const validateId = id => {
+    return mongoose.Types.ObjectId.isValid(id);
+};
+
+```
+
+The mongoose schema contains the note title and content.
+
+```js
+
+let Note = new Schema({
+    title: String,
+    content: String
+});
+
+```
 
 The front-end uses axios for HTTP requests to the backend,
 
