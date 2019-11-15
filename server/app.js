@@ -1,5 +1,5 @@
 const express = require('express');
-const app = express();
+q
 const mongoose = require('mongoose');
 const cors = require('cors');
 const notesController = require('./controller/api/notes/notesController');
