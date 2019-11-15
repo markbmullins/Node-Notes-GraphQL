@@ -10,6 +10,9 @@ create new notes, an editing panel where you can edit the title and content of
 the currently selected note, and save your updates, and a markdown rendering
 panel where you can see how your note looks when parsed.
 
+
+![Demo gif](./demo.gif)
+
 ## To start the app
 
 ### Install mongo
@@ -50,7 +53,7 @@ The client is now running on localhost:3000.
 In this demo you can see all CRUD operations, along with refreshes to between
 them to show the state is maintained.
 
-![Demo gif](./demo.gif)
+
 
 
 ## GraphQL  
@@ -167,6 +170,8 @@ Example queries and return data:
 }
 
 ```
+
+![GraphQL demo gif](./graphqldemo.gif)
 
 ## REST
 
