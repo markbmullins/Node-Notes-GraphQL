@@ -5,6 +5,7 @@
 In Progress: I am currently converting this repo from REST to GraphQL.
 ***
 
+## About  
 
 A MERN markdown note taking app that is build on React, Express, Node and 
 MongoDB. It uses a REST backend for CRUD operations on notes.
@@ -57,8 +58,85 @@ them to show the state is maintained.
 ![Demo gif](./demo.gif)
 
 
+## GraphQL  
 
-The back-end uses Express routes and Mongoose to handle CRUD Operations, 
+```
+
+{
+  note(id:"5dcc655b86d69d20ba3aecbd") {
+    title
+    content
+    id
+  }
+}
+
+```
+
+```
+
+{
+  "data": {
+    "note": {
+      "title": "test",
+      "content": "# create\n\n# test",
+      "id": "5dcc655b86d69d20ba3aecbd"
+    }
+  }
+}
+
+```
+
+```
+
+{
+  notes {
+    title
+    content
+    id
+  }
+}
+
+```
+
+```
+
+{
+  "data": {
+    "notes": [
+      {
+        "title": "New Note",
+        "content": "#Test\n\n## test2\n\n\nSome notes \n\n- bullet points\n\n-\n\n*words*\n",
+        "id": "5dc713b9ed703c68a8058ed6"
+      },
+      {
+        "title": "test",
+        "content": "# create\n\n# test",
+        "id": "5dcc655b86d69d20ba3aecbd"
+      },
+      {
+        "title": "test create",
+        "content": "3 test",
+        "id": "5dcc676654e636224ac3e4e6"
+      },
+      {
+        "title": "test",
+        "content": "test\n\n# test",
+        "id": "5dcc67c954e636224ac3e4e7"
+      },
+      {
+        "title": "test",
+        "content": "test test",
+        "id": "5dcc68804dc320233b884126"
+      }
+    ]
+  }
+}
+
+```
+
+## REST
+
+The back-end also contains REST routes.
 
 ```js
 

@@ -1,10 +1,13 @@
 const graphqlHTTP = require("express-graphql");
 const { buildSchema } = require('graphql');
+const noteService = require("../../service/NoteService");
 
-const schema = buildSchema(`
-    type Query {
-        hello: String
-    }
+  const schema = buildSchema(`
+      type Note {
+        id: ID
+        title: String
+        content: String
+      }
 
       type Query {
           getNote(id: ID!): Note
