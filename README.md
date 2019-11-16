@@ -13,6 +13,8 @@ panel where you can see how your note looks when parsed.
 
 ![Demo gif](./demo.gif)
 
+***
+
 ## To start the app
 
 ### Install mongo
@@ -54,15 +56,15 @@ In this demo you can see all CRUD operations, along with refreshes to between
 them to show the state is maintained.
 
 
-
+***
 
 ## GraphQL  
 
-Schema:
+### Schema
 
 ```js
 
-`
+const schema = buildSchema(`
       type Note {
         id: ID
         title: String
@@ -79,11 +81,11 @@ Schema:
           updateNote(id: ID!, title: String!, content: String): Note
           deleteNote(id: ID!): Boolean
       }
-  `
+  `);
 
 ```
 
-Resolvers:
+### Resolvers
 
 ```js
 
@@ -95,17 +97,20 @@ Resolvers:
 
 ```
 
-Example queries and return data:
+### Example queries and returns
+
+Read one: 
 
 ```js
 
 {
-  note(id:"5dcc655b86d69d20ba3aecbd") {
+  getNote(id: "5dc713b9ed703c68a8058ed6") {
     title
     content
     id
   }
 }
+
 
 ```
 
@@ -113,20 +118,22 @@ Example queries and return data:
 
 {
   "data": {
-    "note": {
-      "title": "test",
-      "content": "# create\n\n# test",
-      "id": "5dcc655b86d69d20ba3aecbd"
+    "getNote": {
+      "title": "New Note",
+      "content": "#Test\n\n## test2\n\n\nSome notes \n\n- bullet points\n\n-\n\n*words*\n",
+      "id": "5dc713b9ed703c68a8058ed6"
     }
   }
 }
 
 ```
 
+Read all:
+
 ```js
 
 {
-  notes {
+  getNotes {
     title
     content
     id
@@ -139,7 +146,7 @@ Example queries and return data:
 
 {
   "data": {
-    "notes": [
+    "getNotes": [
       {
         "title": "New Note",
         "content": "#Test\n\n## test2\n\n\nSome notes \n\n- bullet points\n\n-\n\n*words*\n",
@@ -171,7 +178,141 @@ Example queries and return data:
 
 ```
 
+Create Note:
+
+```js
+
+mutation {
+  createNote(title: "Testing a created note", content: "# test content \n -some content") {
+    title
+    content
+    id
+  }
+}
+
+```
+
+```js
+
+{
+  "data": {
+    "createNote": {
+      "title": "Testing a created note",
+      "content": "# test content \n -some content",
+      "id": "5dd02f31fbb4b756e84d2e1d"
+    }
+  }
+}
+
+```
+
+Update note:
+
+```js
+
+mutation {
+  updateNote(id: "5dd02f31fbb4b756e84d2e1d", title: "Testing an update", content: "# test content \n -some content \n -updated") {
+    title
+    content
+    id
+  }
+}
+
+```
+
+```js
+
+{
+  "data": {
+    "updateNote": {
+      "title": "Testing an update",
+      "content": "# test content \n -some content \n -updated",
+      "id": "5dd02f31fbb4b756e84d2e1d"
+    }
+  }
+}
+
+```
+
+Delete note:
+
+```js
+
+mutation {
+  deleteNote(id: "5dd02f31fbb4b756e84d2e1d")
+}
+
+
+```
+
+```js
+
+{
+  "data": {
+    "deleteNote": true
+  }
+}
+
+```
+
+***
+
+### Apollo GraphQL
+
+
+Front end queries:
+
+```
+
+export const GET_NOTES = gql`
+    {
+        getNotes {
+            title
+            content
+            id
+        }
+    }
+`;
+
+```
+
+This query accepts a [variable](https://graphql.org/learn/queries/#variables) of
+type ID that is required, which matches the query definition in the schema,
+`getNote(id: ID!): Note`. It has an [operation name](https://graphql.org/learn/queries/#operation-name)
+of GetSingleNoteByID, which is a meaningful and explicit name for the operation,
+which is only required in multi-operation documents, but its use is encouraged 
+because it is very helpful for debugging and server-side logging. It has an
+operation type of `query` and returns the fields `title` and `content` from the
+Note type.
+
+```
+
+export const GET_NOTE = gql`
+    query GetSingleNoteByID($id: ID!) {
+        getNote(id: $id) {
+            title
+            content
+        }
+    }
+`;
+
+```
+
+Note type:
+
+```
+
+      type Note {
+        id: ID
+        title: String
+        content: String
+      }
+
+```
+
 ![GraphQL demo gif](./graphqldemo.gif)
+
+***
 
 ## REST
 
@@ -245,8 +386,13 @@ router.route('/:id').delete(function(req, res) {
 
 ```
 
+## Back-end Architecture
 
-Service Layer:
+The back end consists of three layers. A controller with HTTP endpoints, a service layer which can contain logic to modify the queries/return data, and a repository layer to handle database queries.
+
+HTTP Request --> Controller --> Service --> Repository --> MongoDB
+
+### Service Layer:
 
 The service layer sits between the controllers and the Note repository. Create
 and update can accept either a note object or individual note properties.
@@ -284,7 +430,7 @@ const validateId = id => {
 
 ```
 
-Repository Layer:
+### Repository Layer:
 
 The repository layer handles Mongoose queries and returns promises using `.exec()`
 
@@ -335,6 +481,7 @@ let Note = new Schema({
 
 ```
 
+## Front-end architecture
 The front-end uses axios for HTTP requests to the backend,
 
 ```js
@@ -366,7 +513,7 @@ export const deleteNote = id => {
 
 ```
 
-and React Hooks to handle fetching data.
+and React Hooks to handle fetching data from the REST endpoints.
 
 ```js
 
