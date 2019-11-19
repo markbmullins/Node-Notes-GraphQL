@@ -3,7 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
 const notesController = require('./controller/api/notes/notesController');
-const graphqlController = require("./controller/graphql/graphqlController");
+const graphqlController = require('./controller/graphql/graphqlController');
 const indexController = require('./controller/indexController');
 
 const PORT = 3001;
@@ -29,7 +29,7 @@ app.use('/', indexController);
 app.use('/api/notes', notesController);
 
 // GraphQL Endpoint:
-app.use("/graphql", graphqlController);
+app.use('/graphql', graphqlController);
 
 app.listen(PORT, function() {
     console.log('Server is running on Port: ' + PORT);

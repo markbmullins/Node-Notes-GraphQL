@@ -2,11 +2,13 @@ const Note = require('../schema/notes.model');
 const mongoose = require('mongoose');
 
 const create = note => {
-    let noteObj = new Note(note);
+    console.log("called repository.create with: ", note);
+    const noteObj = new Note(note);
     return noteObj.save();
 };
 
 const getAll = () => {
+    console.log("called repository.getall")
     return Note.find({}).exec();
 };
 
@@ -26,6 +28,7 @@ const update = note => {
 };
 
 const deleteById = id => {
+    console.log("called deletebyid with: ", id)
     return Note.findByIdAndDelete(id).exec();
 };
 
