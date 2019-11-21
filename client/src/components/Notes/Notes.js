@@ -77,35 +77,32 @@ const Notes = () => {
         updateNoteByIndex(newNote, currentIndex);
     };
 
-    const saveNote = newNote => {
-        if (newNote._id) {
-            updateNote(newNote).then(resp => {
-                if (resp && resp.data) {
-                    const { title, content, _id } = resp.data;
-                    updateNoteByID({ title, content, _id });
-                }
-            });
-        } else {
-            createNote(newNote).then(resp => {
-                if (resp && resp.data) {
-                    const { title, content, _id } = resp.data;
-                    updateNoteByIndex({ title, content, _id }, currentIndex);
-                }
-            });
+    const ifData = (resp, func) => {
+        if (resp && resp.data) {
+            const { title, content, _id } = resp.data;
+            func({ title, content, _id });
         }
     };
 
     const handleSubmit = event => {
         event.preventDefault();
-        saveNote(notes[currentIndex]);
+        const note = notes[currentIndex];
+        if (note && note._id) {
+            updateNote(note).then(resp => {
+                ifData(resp, updateNoteByID);
+            });
+        } else {
+            createNote(note).then(resp => {
+                ifData(resp, updateNoteByIndex);
+            });
+        }
     };
 
     const initializeNewNote = () => {
-        const newNotes = [...notes, { title: "", content: "" }];
         setCurrentIndex(notes.length);
         setCurrentTitle("");
         setCurrentContent("");
-        setNotes(newNotes);
+        setNotes([...notes, { title: "", content: "" }]);
     };
 
     const handleDelete = index => {
@@ -113,12 +110,12 @@ const Notes = () => {
         const newIndex = index === 0 ? 0 : index - 1;
         if (deletedNote) {
             if (deletedNote._id) {
-                deleteNote(deletedNote._id).then(resp => {
+                deleteNote(deletedNote._id).then(_ => {
                     setNotes(notes.filter(note => note._id !== deletedNote._id));
                     selectNote(newIndex);
                 });
             } else {
-                setNotes(notes.filter((note, indx) => indx !== index));
+                setNotes(notes.filter((_, i) => i !== index));
                 selectNote(newIndex);
             }
         }
@@ -127,7 +124,7 @@ const Notes = () => {
     return (
         <div className="window">
             <div className="flex-row full-window">
-                <div className="border-solid third-window">
+                <div className="border-right-solid third-window">
                     <ListPanel
                         notes={notes}
                         isLoading={loading}
@@ -137,7 +134,7 @@ const Notes = () => {
                         newNote={initializeNewNote}
                     />
                 </div>
-                <div className="border-solid third-window">
+                <div className="border-right-solid third-window">
                     <EditPanel
                         onSubmit={handleSubmit}
                         title={currentTitle}

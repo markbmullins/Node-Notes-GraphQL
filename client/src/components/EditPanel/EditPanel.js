@@ -2,7 +2,7 @@ import React from "react";
 
 const EditPanel = ({ onSubmit, title, onTitleChange, content, onContentChange }) => {
     return (
-        <div className="current-note-panel">
+        <div className="margin-small">
             <form onSubmit={onSubmit} id="notes-form">
                 <div>
                     <label>
@@ -11,18 +11,18 @@ const EditPanel = ({ onSubmit, title, onTitleChange, content, onContentChange })
                             type="text"
                             value={title}
                             onChange={onTitleChange}
-                            className="title-input"
+                            className="input title-input"
                         />
                     </label>
                 </div>
-                <div className="content-input-section">
+                <div className="margin-top">
                     <label>
                         <div className="title underlined">Content: </div>
                         <textarea
                             spellCheck="false"
                             onChange={onContentChange}
                             value={content}
-                            className="content-input">
+                            className="input content-input">
                             ...
                         </textarea>
                     </label>

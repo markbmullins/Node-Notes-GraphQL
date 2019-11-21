@@ -2,7 +2,7 @@ import React from "react";
 
 const ListPanel = ({ notes, isLoading, currentIndex, selectNote, onDelete, newNote }) => {
     return (
-        <div className="notes-panel">
+        <div className="margin-small">
             <div className="flex-row">
                 <div className="title underlined">Notes:</div>
             </div>
@@ -30,8 +30,7 @@ const ListPanel = ({ notes, isLoading, currentIndex, selectNote, onDelete, newNo
                             );
                         })}
                     <div className="card" onClick={() => newNote()}>
-                        {" "}
-                        <br /> + Add new note
+                        + Add new note
                     </div>
                 </div>
             )}
