@@ -1,6 +1,6 @@
 import React from "react";
 
-const EditPanel = (onSubmit, title, onTitleChange, content, onContentChange) => {
+const EditPanel = ({ onSubmit, title, onTitleChange, content, onContentChange }) => {
     return (
         <div className="current-note-panel">
             <form onSubmit={onSubmit} id="notes-form">
