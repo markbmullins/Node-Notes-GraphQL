@@ -1,30 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import {
-    getAllNotes,
-    updateNote,
-    createNote,
-    deleteNote
-} from '../../utils/api/apiUtils';
-import './Notes.scss';
-const ReactMarkdown = require('react-markdown');
+import React, { useState, useEffect } from "react";
+import { getAllNotes, updateNote, createNote, deleteNote } from "../../utils/api/apiUtils";
+import "./Notes.scss";
+const ReactMarkdown = require("react-markdown");
 
 const Notes = () => {
     const [notes, setNotes] = useState([{}]);
     const [loading, setLoading] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [currentContent, setCurrentContent] = useState('');
-    const [currentTitle, setCurrentTitle] = useState('');
+    const [currentContent, setCurrentContent] = useState("");
+    const [currentTitle, setCurrentTitle] = useState("");
 
     // Get all notes on initial render;
     useEffect(() => {
         setLoading(true);
         getAllNotes().then(resp => {
-            console.log(resp)
-            setNotes(resp.data);
             if (resp.data && resp.data[0]) {
-                const firstNote = resp.data[0];
-                setCurrentContent(firstNote.content);
-                setCurrentTitle(firstNote.title);
+                setNotes(resp.data);
+                setCurrentContent(resp.data[0].content);
+                setCurrentTitle(resp.data[0].title);
             }
             setLoading(false);
         });
@@ -36,10 +29,22 @@ const Notes = () => {
         setCurrentTitle(notes[index].title);
     };
 
-    const updateNotes = newNote => {
+    const updateNoteByID = newNote => {
         setNotes(
             notes.map(note => {
                 if (note._id === newNote._id) {
+                    return newNote;
+                } else {
+                    return note;
+                }
+            })
+        );
+    };
+
+    const updateNoteByIndex = (newNote, newNoteIndex) => {
+        setNotes(
+            notes.map((note, index) => {
+                if (index === newNoteIndex) {
                     return newNote;
                 } else {
                     return note;
@@ -56,7 +61,7 @@ const Notes = () => {
         // Update notes state
         const newNote = notes[currentIndex];
         newNote.title = newTitle;
-        updateNotes(newNote);
+        updateNoteByIndex(newNote, currentIndex);
     };
 
     const handleContentChange = event => {
@@ -67,17 +72,23 @@ const Notes = () => {
         // Update notes state
         const newNote = notes[currentIndex];
         newNote.content = newContent;
-        updateNotes(newNote);
+        updateNoteByIndex(newNote, currentIndex);
     };
 
     const saveNote = newNote => {
         if (newNote._id) {
             updateNote(newNote).then(resp => {
-                updateNotes(newNote);
+                if (resp && resp.data) {
+                    const { title, content, _id } = resp.data;
+                    updateNoteByID({ title, content, _id });
+                }
             });
         } else {
             createNote(newNote).then(resp => {
-                updateNotes(resp.data);
+                if (resp && resp.data) {
+                    const { title, content, _id } = resp.data;
+                    updateNoteByIndex({ title, content, _id }, currentIndex);
+                }
             });
         }
     };
@@ -88,21 +99,26 @@ const Notes = () => {
     };
 
     const initializeNewNote = () => {
-        const newNotes = [...notes, { title: '', content: '' }];
-        setCurrentIndex(newNotes.length - 1);
-        setCurrentTitle('');
-        setCurrentContent('');
+        const newNotes = [...notes, { title: "", content: "" }];
+        setCurrentIndex(notes.length);
+        setCurrentTitle("");
+        setCurrentContent("");
         setNotes(newNotes);
     };
 
     const handleDelete = index => {
         const deletedNote = notes[index];
-        const newIndex = currentIndex === 0 ? 0 : currentIndex - 1;
+        const newIndex = index === 0 ? 0 : index - 1;
         if (deletedNote) {
-            deleteNote(deletedNote._id).then(resp => {
-                setNotes(notes.filter(note => note._id !== deletedNote._id));
-                setCurrentIndex(newIndex);
-            });
+            if (deletedNote._id) {
+                deleteNote(deletedNote._id).then(resp => {
+                    setNotes(notes.filter(note => note._id !== deletedNote._id));
+                    selectNote(newIndex);
+                });
+            } else {
+                setNotes(notes.filter((note, indx) => indx !== index));
+                selectNote(newIndex);
+            }
         }
     };
 
@@ -113,7 +129,6 @@ const Notes = () => {
                     <div className="notes-panel">
                         <div className="flex-row">
                             <div className="title underlined">Notes:</div>
-                            {/* <div className="layout-switcher">Layout</div> */}
                         </div>
 
                         {loading ? (
@@ -126,39 +141,28 @@ const Notes = () => {
                                         return (
                                             <div
                                                 key={index}
-                                                onClick={() =>
-                                                    selectNote(index)
-                                                }
+                                                onClick={() => selectNote(index)}
                                                 className={
                                                     index === currentIndex
-                                                        ? 'card-selected'
-                                                        : 'card'
+                                                        ? "card-selected"
+                                                        : "card"
                                                 }>
                                                 <div className="card-body">
                                                     <div>{note.title}</div>
                                                     <div>
-                                                        {note.content.substring(
-                                                            0,
-                                                            20
-                                                        ) + '...'}
+                                                        {note.content.substring(0, 20) + "..."}
                                                     </div>
                                                 </div>
                                                 <div
                                                     className="delete-button"
-                                                    onClick={() =>
-                                                        handleDelete(
-                                                            currentIndex
-                                                        )
-                                                    }>
+                                                    onClick={() => handleDelete(index)}>
                                                     &#10006;
                                                 </div>
                                             </div>
                                         );
                                     })}
-                                <div
-                                    className="card"
-                                    onClick={() => initializeNewNote()}>
-                                    {' '}
+                                <div className="card" onClick={() => initializeNewNote()}>
+                                    {" "}
                                     <br /> + Add new note
                                 </div>
                             </div>
@@ -170,9 +174,7 @@ const Notes = () => {
                         <form onSubmit={handleSubmit} id="notes-form">
                             <div>
                                 <label>
-                                    <div className="title underlined">
-                                        Name:{' '}
-                                    </div>
+                                    <div className="title underlined">Name: </div>
                                     <input
                                         type="text"
                                         value={currentTitle}
@@ -183,9 +185,7 @@ const Notes = () => {
                             </div>
                             <div className="content-input-section">
                                 <label>
-                                    <div className="title underlined">
-                                        Content:{' '}
-                                    </div>
+                                    <div className="title underlined">Content: </div>
                                     <textarea
                                         spellCheck="false"
                                         onChange={handleContentChange}
