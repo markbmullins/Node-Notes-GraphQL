@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { getAllNotes, updateNote, createNote, deleteNote } from "../../utils/api/apiUtils";
 import "./Notes.scss";
-const ReactMarkdown = require("react-markdown");
+import PreviewPanel from "../PreviewPanel/PreviewPanel";
+import ListPanel from "../ListPanel/ListPanel";
+import EditPanel from "../EditPanel/EditPanel";
 
 const Notes = () => {
     const [notes, setNotes] = useState([{}]);
@@ -126,86 +128,26 @@ const Notes = () => {
         <div className="window">
             <div className="flex-row full-window">
                 <div className="border-solid third-window">
-                    <div className="notes-panel">
-                        <div className="flex-row">
-                            <div className="title underlined">Notes:</div>
-                        </div>
-
-                        {loading ? (
-                            <div>Loading.....</div>
-                        ) : (
-                            <div>
-                                {notes &&
-                                    notes[0] &&
-                                    notes.map((note, index) => {
-                                        return (
-                                            <div
-                                                key={index}
-                                                onClick={() => selectNote(index)}
-                                                className={
-                                                    index === currentIndex
-                                                        ? "card-selected"
-                                                        : "card"
-                                                }>
-                                                <div className="card-body">
-                                                    <div>{note.title}</div>
-                                                    <div>
-                                                        {note.content.substring(0, 20) + "..."}
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    className="delete-button"
-                                                    onClick={() => handleDelete(index)}>
-                                                    &#10006;
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                <div className="card" onClick={() => initializeNewNote()}>
-                                    {" "}
-                                    <br /> + Add new note
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                    <ListPanel
+                        notes={notes}
+                        isLoading={loading}
+                        currentIndex={currentIndex}
+                        selectNote={selectNote}
+                        onDelete={handleDelete}
+                        newNote={initializeNewNote}
+                    />
                 </div>
                 <div className="border-solid third-window">
-                    <div className="current-note-panel">
-                        <form onSubmit={handleSubmit} id="notes-form">
-                            <div>
-                                <label>
-                                    <div className="title underlined">Name: </div>
-                                    <input
-                                        type="text"
-                                        value={currentTitle}
-                                        onChange={handleTitleChange}
-                                        className="title-input"
-                                    />
-                                </label>
-                            </div>
-                            <div className="content-input-section">
-                                <label>
-                                    <div className="title underlined">Content: </div>
-                                    <textarea
-                                        spellCheck="false"
-                                        onChange={handleContentChange}
-                                        value={currentContent}
-                                        className="content-input">
-                                        ...
-                                    </textarea>
-                                </label>
-                            </div>
-                            <div>
-                                <input type="submit" value="Save Note" />
-                            </div>
-                        </form>
-                    </div>
+                    <EditPanel
+                        onSubmit={handleSubmit}
+                        title={currentTitle}
+                        content={currentContent}
+                        onTitleChange={handleTitleChange}
+                        onContentChange={handleContentChange}
+                    />
                 </div>
                 <div className="third-window">
-                    <div className="rendered-markdown">
-                        <div className="title underlined">{currentTitle}</div>
-                        <ReactMarkdown source={currentContent} />
-                    </div>
+                    <PreviewPanel title={currentTitle} content={currentContent} />
                 </div>
             </div>
         </div>
