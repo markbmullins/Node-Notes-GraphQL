@@ -1,11 +1,11 @@
-import React from "react";
-const ReactMarkdown = require("react-markdown");
+import React from 'react';
+const ReactMarkdown = require('react-markdown');
 
-const PreviewPanel = ({ content, title }) => {
+const PreviewPanel = ({ selectedNote}) => {
     return (
         <div className="margin-small">
-            <div className="title underlined">{title}</div>
-            <ReactMarkdown source={content} />
+            <div className="title underlined">{selectedNote.title}</div>
+            <ReactMarkdown source={selectedNote.content} />
         </div>
     );
 };

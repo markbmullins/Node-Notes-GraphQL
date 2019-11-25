@@ -23,7 +23,7 @@ const updateNote = async ({ id, title, content }) => {
 
 const deleteNote = async ({ id }) => {
   const note = await noteService.deleteById(id);
-  return note ? true : false;
+  return note ? note.id : null;
 };
 
 module.exports = {

@@ -1,6 +1,14 @@
-import React from "react";
+import React from 'react';
 
-const ListPanel = ({ notes, isLoading, currentIndex, selectNote, onDelete, newNote }) => {
+const ListPanel = ({
+    notes,
+    selectedNote,
+    isLoading,
+    error,
+    onSelectNote,
+    onDelete,
+    onNewNote
+}) => {
     return (
         <div className="margin-small">
             <div className="flex-row">
@@ -13,23 +21,32 @@ const ListPanel = ({ notes, isLoading, currentIndex, selectNote, onDelete, newNo
                 <div>
                     {notes &&
                         notes[0] &&
-                        notes.map((note, index) => {
+                        notes.map(note => {
+                            const { id, title, content } = note;
                             return (
                                 <div
-                                    key={index}
-                                    onClick={() => selectNote(index)}
-                                    className={index === currentIndex ? "card-selected" : "card"}>
+                                    key={id}
+                                    onClick={() => onSelectNote(note)}
+                                    className={
+                                        id === selectedNote.id
+                                            ? 'card-selected'
+                                            : 'card'
+                                    }>
                                     <div className="card-body">
-                                        <div>{note.title}</div>
-                                        <div>{note.content.substring(0, 20) + "..."}</div>
+                                        <div>{title}</div>
+                                        <div>
+                                            {content.substring(0, 20) + '...'}
+                                        </div>
                                     </div>
-                                    <div className="delete-button" onClick={() => onDelete(index)}>
+                                    <div
+                                        className="delete-button"
+                                        onClick={() => onDelete(id)}>
                                         &#10006;
                                     </div>
                                 </div>
                             );
                         })}
-                    <div className="card" onClick={() => newNote()}>
+                    <div className="card" onClick={() => onNewNote()}>
                         + Add new note
                     </div>
                 </div>

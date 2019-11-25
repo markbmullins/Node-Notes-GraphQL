@@ -1,6 +1,11 @@
-import React from "react";
+import React from 'react';
 
-const EditPanel = ({ onSubmit, title, onTitleChange, content, onContentChange }) => {
+const EditPanel = ({
+    selectedNote,
+    onSubmit,
+    onTitleChange,
+    onContentChange
+}) => {
     return (
         <div className="margin-small">
             <form onSubmit={onSubmit} id="notes-form">
@@ -9,9 +14,10 @@ const EditPanel = ({ onSubmit, title, onTitleChange, content, onContentChange })
                         <div className="title underlined">Name: </div>
                         <input
                             type="text"
-                            value={title}
+                            value={selectedNote.title || ''}
                             onChange={onTitleChange}
                             className="input title-input"
+                            onBlur={onSubmit}
                         />
                     </label>
                 </div>
@@ -21,10 +27,9 @@ const EditPanel = ({ onSubmit, title, onTitleChange, content, onContentChange })
                         <textarea
                             spellCheck="false"
                             onChange={onContentChange}
-                            value={content}
-                            className="input content-input">
-                            ...
-                        </textarea>
+                            value={selectedNote.content || ''}
+                            className="input content-input"
+                            onBlur={onSubmit}/>
                     </label>
                 </div>
                 <div>

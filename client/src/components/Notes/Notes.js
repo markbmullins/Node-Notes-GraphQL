@@ -1,124 +1,92 @@
-import React, { useState, useEffect } from "react";
-import { getAllNotes, updateNote, createNote, deleteNote } from "../../utils/api/apiUtils";
-import "./Notes.scss";
-import PreviewPanel from "../PreviewPanel/PreviewPanel";
-import ListPanel from "../ListPanel/ListPanel";
-import EditPanel from "../EditPanel/EditPanel";
+import React, { useState } from 'react';
+import { useQuery, useMutation } from '@apollo/react-hooks';
+import {
+    GET_NOTES,
+    UPDATE_NOTE,
+    CREATE_NOTE,
+    DELETE_NOTE
+} from '../../utils/api/apolloUtils';
+import './Notes.scss';
+import PreviewPanel from '../PreviewPanel/PreviewPanel';
+import ListPanel from '../ListPanel/ListPanel';
+import EditPanel from '../EditPanel/EditPanel';
 
 const Notes = () => {
-    const [notes, setNotes] = useState([{}]);
-    const [loading, setLoading] = useState(true);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [currentContent, setCurrentContent] = useState("");
-    const [currentTitle, setCurrentTitle] = useState("");
+    /**
+     * Local state
+     */
+    const [selectedNote, setSelectedNote] = useState({
+        id: '',
+        title: '',
+        content: ''
+    });
 
-    // Get all notes on initial render;
-    useEffect(() => {
-        setLoading(true);
-        getAllNotes().then(resp => {
-            if (resp.data && resp.data[0]) {
-                setNotes(resp.data);
-                setCurrentContent(resp.data[0].content);
-                setCurrentTitle(resp.data[0].title);
-            }
-            setLoading(false);
-        });
-    }, []);
-
-    const selectNote = index => {
-        setCurrentIndex(index);
-        setCurrentContent(notes[index].content);
-        setCurrentTitle(notes[index].title);
-    };
-
-    const updateNoteByID = newNote => {
-        setNotes(
-            notes.map(note => {
-                if (note._id === newNote._id) {
-                    return newNote;
-                } else {
-                    return note;
-                }
-            })
-        );
-    };
-
-    const updateNoteByIndex = (newNote, newNoteIndex) => {
-        setNotes(
-            notes.map((note, index) => {
-                if (index === newNoteIndex) {
-                    return newNote;
-                } else {
-                    return note;
-                }
-            })
-        );
-    };
-
-    const handleTitleChange = event => {
-        // Update field state
-        const newTitle = event.target.value;
-        setCurrentTitle(newTitle);
-
-        // Update notes state
-        const newNote = notes[currentIndex];
-        newNote.title = newTitle;
-        updateNoteByIndex(newNote, currentIndex);
-    };
-
-    const handleContentChange = event => {
-        // Update field state
-        const newContent = event.target.value;
-        setCurrentContent(newContent);
-
-        // Update notes state
-        const newNote = notes[currentIndex];
-        newNote.content = newContent;
-        updateNoteByIndex(newNote, currentIndex);
-    };
-
-    const ifData = (resp, func) => {
-        if (resp && resp.data) {
-            const { title, content, _id } = resp.data;
-            func({ title, content, _id });
+    /**
+     * GraphQL Mutations
+     */
+    const { loading, error, data } = useQuery(GET_NOTES);
+    let notes;
+    if (data) notes = data.getNotes;
+    const [updateNoteMutation] = useMutation(UPDATE_NOTE);
+    const [createNoteMutation] = useMutation(CREATE_NOTE, {
+        update(cache, { data: { createNote } }) {
+            const { getNotes: notes } = cache.readQuery({ query: GET_NOTES });
+            cache.writeQuery({
+                query: GET_NOTES,
+                data: { getNotes: [...notes, createNote] }
+            });
+            setSelectedNote(createNote);
         }
-    };
+    });
+    const [deleteNoteMutation] = useMutation(DELETE_NOTE, {
+        update(cache, { data: { deleteNote } }) {
+            const { getNotes: notes } = cache.readQuery({ query: GET_NOTES });
+            cache.writeQuery({
+                query: GET_NOTES,
+                data: { getNotes: notes.filter(note => note.id !== deleteNote) }
+            });
+            setSelectedNote(deleteNote);
+        }
+    });
+
+    /**
+     * Handlers
+     */
+    const handleSelectNote = note => setSelectedNote(note);
+
+    const handleTitleChange = event =>
+        setSelectedNote({ ...selectedNote, title: event.target.value });
+
+    const handleContentChange = event =>
+        setSelectedNote({ ...selectedNote, content: event.target.value });
 
     const handleSubmit = event => {
         event.preventDefault();
-        const note = notes[currentIndex];
-        if (note && note._id) {
-            updateNote(note).then(resp => {
-                ifData(resp, updateNoteByID);
+        if (selectedNote && selectedNote.id) {
+            updateNoteMutation({
+                variables: {
+                    id: selectedNote.id,
+                    content: selectedNote.content,
+                    title: selectedNote.title
+                }
             });
         } else {
-            createNote(note).then(resp => {
-                ifData(resp, updateNoteByIndex);
+            createNoteMutation({
+                variables: {
+                    content: selectedNote.content,
+                    title: selectedNote.title
+                }
             });
         }
     };
 
-    const initializeNewNote = () => {
-        setCurrentIndex(notes.length);
-        setCurrentTitle("");
-        setCurrentContent("");
-        setNotes([...notes, { title: "", content: "" }]);
+    const handleNewNote = () => {
+        createNoteMutation({ variables: { content: '', title: '' } });
     };
 
-    const handleDelete = index => {
-        const deletedNote = notes[index];
-        const newIndex = index === 0 ? 0 : index - 1;
-        if (deletedNote) {
-            if (deletedNote._id) {
-                deleteNote(deletedNote._id).then(_ => {
-                    setNotes(notes.filter(note => note._id !== deletedNote._id));
-                    selectNote(newIndex);
-                });
-            } else {
-                setNotes(notes.filter((_, i) => i !== index));
-                selectNote(newIndex);
-            }
-        }
+    const handleDelete = id => {
+        console.log('id in handle delete: ', id);
+        deleteNoteMutation({ variables: { id } });
     };
 
     return (
@@ -128,23 +96,23 @@ const Notes = () => {
                     <ListPanel
                         notes={notes}
                         isLoading={loading}
-                        currentIndex={currentIndex}
-                        selectNote={selectNote}
+                        error={error}
+                        selectedNote={selectedNote}
+                        onSelectNote={handleSelectNote}
                         onDelete={handleDelete}
-                        newNote={initializeNewNote}
+                        onNewNote={handleNewNote}
                     />
                 </div>
                 <div className="border-right-solid third-window">
                     <EditPanel
+                        selectedNote={selectedNote}
                         onSubmit={handleSubmit}
-                        title={currentTitle}
-                        content={currentContent}
                         onTitleChange={handleTitleChange}
                         onContentChange={handleContentChange}
                     />
                 </div>
                 <div className="third-window">
-                    <PreviewPanel title={currentTitle} content={currentContent} />
+                    <PreviewPanel selectedNote={selectedNote} />
                 </div>
             </div>
         </div>
