@@ -278,8 +278,9 @@ export const GET_NOTES = gql`
 
 This query accepts a [variable](https://graphql.org/learn/queries/#variables) of
 type ID that is required, which matches the query definition in the schema,
-`getNote(id: ID!): Note`. It has an [operation name](https://graphql.org/learn/queries/#operation-name)
-of GetSingleNoteByID, which is a meaningful and explicit name for the operation,
+`getNote(id: ID!): Note`. It has an
+[operation name](https://graphql.org/learn/queries/#operation-name) of 
+GetSingleNoteByID, which is a meaningful and explicit name for the operation,
 which is only required in multi-operation documents, but its use is encouraged 
 because it is very helpful for debugging and server-side logging. It has an
 operation type of `query` and returns the fields `title` and `content` from the
@@ -388,7 +389,9 @@ router.route('/:id').delete(function(req, res) {
 
 ## Back-end Architecture
 
-The back end consists of three layers. A controller with HTTP endpoints, a service layer which can contain logic to modify the queries/return data, and a repository layer to handle database queries.
+The back end consists of three layers. A controller with HTTP endpoints, a
+service layer which can contain logic to modify the queries/return data, and a
+repository layer to handle database queries.
 
 HTTP Request --> Controller --> Service --> Repository --> MongoDB
 
@@ -432,7 +435,8 @@ const validateId = id => {
 
 ### Repository Layer:
 
-The repository layer handles Mongoose queries and returns promises using `.exec()`
+The repository layer handles Mongoose queries and returns
+promises using `.exec()`
 
 ```js
 
@@ -482,7 +486,7 @@ let Note = new Schema({
 ```
 
 ## Front-end architecture
-The front-end uses axios for HTTP requests to the backend,
+The front-end handles HTTP REST requests with Axios,
 
 ```js
 
@@ -531,4 +535,47 @@ and React Hooks to handle fetching data from the REST endpoints.
         });
     }, []);
 
+```
+
+For GraphQL requests, it uses 
+[Apollo React Hooks](https://www.apollographql.com/docs/react/api/react-hooks/).
+To get all notes, the hook `useQuery` is used.
+
+```js
+    const { loading, error, data } = useQuery(GET_NOTES);
+```
+
+
+For creating, updating or deleting notes, the `useMutation` hook is used.
+
+```js
+    const [updateNoteMutation] = useMutation(UPDATE_NOTE);
+
+   
+    const [createNoteMutation] = useMutation(CREATE_NOTE, {
+        update(cache, { data: { createNote } }) {
+            updateCache(cache, createNote, (a, b) => [...a, b]);
+        }
+    });
+    const [deleteNoteMutation] = useMutation(DELETE_NOTE, {
+        update(cache, { data: { deleteNote } }) {
+            updateCache(cache, deleteNote, (a, b) => a.filter(a => a.id !== b));
+        }
+    });
+```
+
+A helper function `updateCache` handles updating the Apollo cache with a given
+filter function. To add to the list of notes, array 
+[spread syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)
+is used, and to remove the note, the array is [filtered](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter) by `id`.
+
+```js
+ const updateCache = (cache, newNote, filterFunction) => {
+        const { getNotes: notes } = cache.readQuery({ query: GET_NOTES });
+        cache.writeQuery({
+            query: GET_NOTES,
+            data: { getNotes: filterFunction(notes, newNote) }
+        });
+        setSelectedNote(newNote);
+    };
 ```
