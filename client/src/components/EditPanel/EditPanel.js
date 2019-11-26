@@ -29,7 +29,8 @@ const EditPanel = ({
                             onChange={onContentChange}
                             value={selectedNote.content || ''}
                             className="input content-input"
-                            onBlur={onSubmit}/>
+                            onBlur={onSubmit}
+                        />
                     </label>
                 </div>
                 <div>

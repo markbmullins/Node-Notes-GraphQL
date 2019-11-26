@@ -25,27 +25,24 @@ const Notes = () => {
      * GraphQL Mutations
      */
     const { loading, error, data } = useQuery(GET_NOTES);
-    let notes;
-    if (data) notes = data.getNotes;
     const [updateNoteMutation] = useMutation(UPDATE_NOTE);
+
+    const updateCache = (cache, newNote, filterFunction) => {
+        const { getNotes: notes } = cache.readQuery({ query: GET_NOTES });
+        cache.writeQuery({
+            query: GET_NOTES,
+            data: { getNotes: filterFunction(notes, newNote) }
+        });
+        setSelectedNote(newNote);
+    };
     const [createNoteMutation] = useMutation(CREATE_NOTE, {
         update(cache, { data: { createNote } }) {
-            const { getNotes: notes } = cache.readQuery({ query: GET_NOTES });
-            cache.writeQuery({
-                query: GET_NOTES,
-                data: { getNotes: [...notes, createNote] }
-            });
-            setSelectedNote(createNote);
+            updateCache(cache, createNote, (a, b) => [...a, b]);
         }
     });
     const [deleteNoteMutation] = useMutation(DELETE_NOTE, {
         update(cache, { data: { deleteNote } }) {
-            const { getNotes: notes } = cache.readQuery({ query: GET_NOTES });
-            cache.writeQuery({
-                query: GET_NOTES,
-                data: { getNotes: notes.filter(note => note.id !== deleteNote) }
-            });
-            setSelectedNote(deleteNote);
+            updateCache(cache, deleteNote, (a, b) => a.filter(a => a.id !== b));
         }
     });
 
@@ -60,33 +57,31 @@ const Notes = () => {
     const handleContentChange = event =>
         setSelectedNote({ ...selectedNote, content: event.target.value });
 
+    const handleNewNote = () => createNoteMutation({ variables: { content: '', title: '' } });
+
+    const handleDelete = id => deleteNoteMutation({ variables: { id } });
+
     const handleSubmit = event => {
         event.preventDefault();
-        if (selectedNote && selectedNote.id) {
+        if (!selectedNote) return;
+
+        const variables = {
+            content: selectedNote.content,
+            title: selectedNote.title
+        };
+
+        if (selectedNote.id) {
             updateNoteMutation({
                 variables: {
                     id: selectedNote.id,
-                    content: selectedNote.content,
-                    title: selectedNote.title
+                    ...variables
                 }
             });
         } else {
             createNoteMutation({
-                variables: {
-                    content: selectedNote.content,
-                    title: selectedNote.title
-                }
+                variables
             });
         }
-    };
-
-    const handleNewNote = () => {
-        createNoteMutation({ variables: { content: '', title: '' } });
-    };
-
-    const handleDelete = id => {
-        console.log('id in handle delete: ', id);
-        deleteNoteMutation({ variables: { id } });
     };
 
     return (
@@ -94,7 +89,7 @@ const Notes = () => {
             <div className="flex-row full-window">
                 <div className="border-right-solid third-window">
                     <ListPanel
-                        notes={notes}
+                        data={data}
                         isLoading={loading}
                         error={error}
                         selectedNote={selectedNote}
