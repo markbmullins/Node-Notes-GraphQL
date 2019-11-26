@@ -1,7 +1,6 @@
 const noteService = require("../../service/noteService");
 
 const getNotes = () => {
-  console.log("called getNotes resolver");
   return noteService.getAll();
 };
 
@@ -10,9 +9,7 @@ const getNote = ({ id }) => {
 };
 
 const createNote = async ({ title, content }) => {
-  console.log("called createNote resolver with ", title, content);
   const note = await noteService.create(title, content);
-  console.log("returned note: ", note);
   return note;
 };
 
