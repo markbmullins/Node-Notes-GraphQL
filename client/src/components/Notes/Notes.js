@@ -57,7 +57,8 @@ const Notes = () => {
     const handleContentChange = event =>
         setSelectedNote({ ...selectedNote, content: event.target.value });
 
-    const handleNewNote = () => createNoteMutation({ variables: { content: '', title: '' } });
+    const handleNewNote = () =>
+        createNoteMutation({ variables: { content: '', title: '' } });
 
     const handleDelete = id => deleteNoteMutation({ variables: { id } });
 

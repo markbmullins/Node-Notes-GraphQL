@@ -4,7 +4,6 @@ const Card = ({ note, onSelectNote, onDelete, selectedNote }) => {
     const { id, title, content } = note;
     return (
         <div
-            key={id}
             onClick={() => onSelectNote(note)}
             className={id === selectedNote.id ? 'card-selected' : 'card'}>
             <div className="card-body">
@@ -32,7 +31,7 @@ const ListPanel = props => {
             </div>
             <div>
                 {notes.map(note => {
-                    return <Card note={note} {...props} />;
+                    return <Card key={note.id} note={note} {...props} />;
                 })}
                 <div className="card" onClick={() => onNewNote()}>
                     + Add new note
