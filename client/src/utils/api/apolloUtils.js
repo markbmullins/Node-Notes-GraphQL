@@ -1,4 +1,4 @@
-import { gql } from 'apollo-boost';
+import { gql } from "apollo-boost";
 
 export const GET_NOTES = gql`
     {
@@ -6,6 +6,7 @@ export const GET_NOTES = gql`
             title
             content
             id
+            order
         }
     }
 `;
@@ -16,6 +17,7 @@ export const GET_NOTE = gql`
             title
             content
             id
+            order
         }
     }
 `;
@@ -26,6 +28,7 @@ export const UPDATE_NOTE = gql`
             title
             content
             id
+            order
         }
     }
 `;
@@ -36,12 +39,13 @@ export const CREATE_NOTE = gql`
             title
             content
             id
+            order
         }
     }
 `;
 
 export const DELETE_NOTE = gql`
-    mutation DeleteNote($id: ID!)  {
+    mutation DeleteNote($id: ID!) {
         deleteNote(id: $id)
     }
 `;

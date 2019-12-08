@@ -1,30 +1,36 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation } from '@apollo/react-hooks';
-import {
-    GET_NOTES,
-    UPDATE_NOTE,
-    CREATE_NOTE,
-    DELETE_NOTE
-} from '../../utils/api/apolloUtils';
-import './Notes.scss';
-import PreviewPanel from '../PreviewPanel/PreviewPanel';
-import ListPanel from '../ListPanel/ListPanel';
-import EditPanel from '../EditPanel/EditPanel';
+import React, { useState } from "react";
+import { useQuery, useMutation } from "@apollo/react-hooks";
+import { GET_NOTES, UPDATE_NOTE, CREATE_NOTE, DELETE_NOTE } from "../../utils/api/apolloUtils";
+import "./Notes.scss";
+import PreviewPanel from "../PreviewPanel/PreviewPanel";
+import ListPanel from "../ListPanel/ListPanel";
+import EditPanel from "../EditPanel/EditPanel";
+
+const sortByOrder = data => {
+    if (data && Array.isArray(data) && data.length !== 0) {
+        data.sort((a, b) => (a.order > b.order ? 1 : -1));
+    }
+};
 
 const Notes = () => {
     /**
      * Local state
      */
     const [selectedNote, setSelectedNote] = useState({
-        id: '',
-        title: '',
-        content: ''
+        id: "",
+        title: "",
+        content: ""
     });
 
     /**
      * GraphQL Mutations
      */
     const { loading, error, data } = useQuery(GET_NOTES);
+
+    if (data && data.getNotes) {
+        sortByOrder(data.getNotes);
+    }
+
     const [updateNoteMutation] = useMutation(UPDATE_NOTE);
 
     const updateCache = (cache, newNote, filterFunction) => {
@@ -57,8 +63,7 @@ const Notes = () => {
     const handleContentChange = event =>
         setSelectedNote({ ...selectedNote, content: event.target.value });
 
-    const handleNewNote = () =>
-        createNoteMutation({ variables: { content: '', title: '' } });
+    const handleNewNote = () => createNoteMutation({ variables: { content: "", title: "" } });
 
     const handleDelete = id => deleteNoteMutation({ variables: { id } });
 
