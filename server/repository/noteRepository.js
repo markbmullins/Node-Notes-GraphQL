@@ -14,15 +14,12 @@ const getByID = id => {
     return Note.findById(id).exec();
 };
 
-const update = note => {
-    const { title, content, id, order } = note;
-    return Note.findById(id)
+const update = newValues => {
+    return Note.findById(newValues.id)
         .exec()
         .then(note => {
-            note.title = title;
-            note.content = content;
-            note.order = order;
-            return note.save();
+            delete newValues.id;
+            return Object.assign(note, newValues).save();
         });
 };
 
