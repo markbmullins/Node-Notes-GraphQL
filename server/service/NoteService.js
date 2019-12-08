@@ -1,16 +1,8 @@
-const noteRepository = require('../repository/noteRepository');
+const noteRepository = require("../repository/noteRepository");
 
-const create = (...args) => {
-    if (!args || args.length === 0)  {
-        return null;
-    }
-    if (args.length === 1) {
-        return noteRepository.create(args[0]);
-    } 
-    if (args.length === 2) {
-        return noteRepository.create({ title: args[0], content: args[1] });
-    }
-        
+const create = params => {
+    if (!params) return null;
+    return noteRepository.create(params);
 };
 
 const getAll = () => {
@@ -21,15 +13,9 @@ const getByID = id => {
     return noteRepository.getByID(id);
 };
 
-const update = (...args) => {
-    if (!args || args.length === 0) return null;
-    if (args.length === 1) return noteRepository.update(args[0]);
-    if (args.length === 3)
-        return noteRepository.update({
-            _id: args[0],
-            title: args[1],
-            content: args[2]
-        });
+const update = params => {
+    if (!params || !params.id) return null;
+    return noteRepository.update(params);
 };
 
 const deleteById = id => {

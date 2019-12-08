@@ -1,5 +1,5 @@
-const Note = require('../schema/notes.model');
-const mongoose = require('mongoose');
+const Note = require("../schema/notes.model");
+const mongoose = require("mongoose");
 
 const create = note => {
     const noteObj = new Note(note);
@@ -15,12 +15,13 @@ const getByID = id => {
 };
 
 const update = note => {
-    const { title, content } = note;
-    return Note.findById(note._id)
+    const { title, content, id, order } = note;
+    return Note.findById(id)
         .exec()
         .then(note => {
             note.title = title;
             note.content = content;
+            note.order = order;
             return note.save();
         });
 };
