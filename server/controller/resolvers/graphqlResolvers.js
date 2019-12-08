@@ -9,18 +9,15 @@ const getNote = ({ id }) => {
 };
 
 const createNote = async params => {
-    const note = await noteService.create(params);
-    return note;
+    return await noteService.create(params);
 };
 
 const updateNote = async params => {
-    const note = await noteService.update(params);
-    return note;
+    return await noteService.update(params);
 };
 
 const deleteNote = async ({ id }) => {
-    const note = await noteService.deleteById(id);
-    return note ? note.id : null;
+    return await noteService.deleteById(id);
 };
 
 module.exports = {

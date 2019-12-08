@@ -6,13 +6,9 @@ const create = note => {
     return noteObj.save();
 };
 
-const getAll = () => {
-    return Note.find({}).exec();
-};
+const getAll = () => Note.find({}).exec();
 
-const getByID = id => {
-    return Note.findById(id).exec();
-};
+const getByID = id => Note.findById(id).exec();
 
 const update = newValues => {
     return Note.findById(newValues.id)
@@ -23,13 +19,9 @@ const update = newValues => {
         });
 };
 
-const deleteById = id => {
-    return Note.findByIdAndDelete(id).exec();
-};
+const deleteById = id => Note.findByIdAndDelete(id).exec();
 
-const validateId = id => {
-    return mongoose.Types.ObjectId.isValid(id);
-};
+const validateId = id => mongoose.Types.ObjectId.isValid(id);
 
 module.exports = {
     getAll,
