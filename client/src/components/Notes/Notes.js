@@ -54,7 +54,7 @@ const Notes = () => {
     });
 
     /**
-     * GraphQL Mutations
+     * GraphQL Queries
      */
     const { loading, error, data } = useQuery(GET_NOTES);
 
@@ -62,13 +62,23 @@ const Notes = () => {
         sortByOrder(data.getNotes);
     }
 
+    /**
+     * GraphQL Mutations
+     */
     const [updateNoteMutation] = useMutation(UPDATE_NOTE);
 
-    const updateCache = (cache, newNote, filterFunction) => {
+    /**
+     * Reads cache and updates it with a passed in note, in a manner defined
+     * by the filter function.
+     * @param {Object} cache A reference to the Apollo Cache object
+     * @param {Object} note The note that is being added, updated or removed from cache.
+     * @param {Object} filterFunction The function to apply to the list of notes from cache. 
+     */
+    const updateCache = (cache, note, filterFunction) => {
         const { getNotes: notes } = cache.readQuery({ query: GET_NOTES });
         cache.writeQuery({
             query: GET_NOTES,
-            data: { getNotes: filterFunction(notes, newNote) }
+            data: { getNotes: filterFunction(notes, note) }
         });
     };
 
@@ -89,13 +99,20 @@ const Notes = () => {
     /**
      * Handlers
      */
-    const handleSelectNote = note => setSelectedNote(note);
 
-    const handleTitleChange = event =>
-        setSelectedNote({ ...selectedNote, title: event.target.value });
+    /**
+     * Handles the title change event
+     * @param {Event} e change event emitted from the input element 
+     */
+    const handleTitleChange = e =>
+        setSelectedNote({ ...selectedNote, title: e.target.value });
 
-    const handleContentChange = event =>
-        setSelectedNote({ ...selectedNote, content: event.target.value });
+    /**
+     * Handles the content change event
+     * @param {Event} e change event emitted from the textarea element
+     */
+    const handleContentChange = e =>
+        setSelectedNote({ ...selectedNote, content: e.target.value });
 
     const handleNewNote = () =>
         createNoteMutation({
@@ -104,8 +121,13 @@ const Notes = () => {
 
     const handleDelete = id => deleteNoteMutation({ variables: { id } });
 
-    const handleSubmit = event => {
-        event.preventDefault();
+    /**
+     * Handles the event from the submit button and executes update mutatuin
+     * with the selected note.
+     * @param {Event} e submit event emitted from submit button
+     */
+    const handleSubmit = e => {
+        e.preventDefault();
         if (!selectedNote) return;
 
         const variables = {
@@ -113,16 +135,14 @@ const Notes = () => {
             title: selectedNote.title
         };
 
+        // Note should have an id because new note 
+        // function stores a blank note in the DB 
         if (selectedNote.id) {
             updateNoteMutation({
                 variables: {
                     id: selectedNote.id,
                     ...variables
                 }
-            });
-        } else {
-            createNoteMutation({
-                variables
             });
         }
     };
@@ -136,7 +156,7 @@ const Notes = () => {
                         isLoading={loading}
                         error={error}
                         selectedNote={selectedNote}
-                        onSelectNote={handleSelectNote}
+                        onSelectNote={setSelectedNote}
                         onDelete={handleDelete}
                         onNewNote={handleNewNote}
                     />
