@@ -30,14 +30,14 @@ const getHighestOrder = data => {
 
 /**
  * Adds item to the end of an array of items
- * @param {*} a original array of items
+ * @param {Array} a original array of items
  * @param {*} b item to add to array
  */
 const addToArray = (a, b) => [...a, b];
 
 /**
  * Filters item from array by id property
- * @param {*} a array of items with an id property
+ * @param {Array} a array of items with an id property
  * @param {*} b item to remove from array
  */
 const filterFromArrayById = (a, b) => a.filter(a => a.id !== b.id);
