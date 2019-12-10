@@ -46,6 +46,9 @@ export const CREATE_NOTE = gql`
 
 export const DELETE_NOTE = gql`
     mutation DeleteNote($id: ID!) {
-        deleteNote(id: $id)
+        deleteNote(id: $id) {
+            id
+            order
+        }
     }
 `;

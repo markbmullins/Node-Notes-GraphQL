@@ -6,22 +6,43 @@ import PreviewPanel from "../PreviewPanel/PreviewPanel";
 import ListPanel from "../ListPanel/ListPanel";
 import EditPanel from "../EditPanel/EditPanel";
 
+/**
+ *  Sorts an array of notes by their order property
+ * @param {Array} data an array of notes
+ */
 const sortByOrder = data => {
     if (data && Array.isArray(data) && data.length !== 0) {
         data.sort((a, b) => (a.order > b.order ? 1 : -1));
     }
 };
 
+/**
+ * Returns the highest order number in a list of notes
+ * @param {Array} data an array of notes
+ */
 const getHighestOrder = data => {
     let highest = -1;
     data.forEach(note => {
-        console.log("current: ", note.order);
         if (note.order > highest) highest = note.order;
     });
-    console.log("highest", highest);
     return highest;
 };
 
+/**
+ * Adds item to the end of an array of items
+ * @param {*} a original array of items
+ * @param {*} b item to add to array
+ */
+const addToArray = (a, b) => [...a, b];
+
+/**
+ * Filters item from array by id property
+ * @param {*} a array of items with an id property
+ * @param {*} b item to remove from array
+ */
+const filterFromArrayById = (a, b) => a.filter(a => a.id !== b.id);
+
+// TODO: Fix selected note updating incorrectly after delete
 const Notes = () => {
     /**
      * Local state
@@ -49,16 +70,19 @@ const Notes = () => {
             query: GET_NOTES,
             data: { getNotes: filterFunction(notes, newNote) }
         });
-        setSelectedNote(newNote);
     };
+
     const [createNoteMutation] = useMutation(CREATE_NOTE, {
         update(cache, { data: { createNote } }) {
-            updateCache(cache, createNote, (a, b) => [...a, b]);
+            updateCache(cache, createNote, addToArray);
+            setSelectedNote(createNote);
         }
     });
+
     const [deleteNoteMutation] = useMutation(DELETE_NOTE, {
         update(cache, { data: { deleteNote } }) {
-            updateCache(cache, deleteNote, (a, b) => a.filter(a => a.id !== b));
+            updateCache(cache, deleteNote, filterFromArrayById);
+            setSelectedNote(deleteNote.order - 1);
         }
     });
 
