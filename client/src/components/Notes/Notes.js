@@ -12,6 +12,16 @@ const sortByOrder = data => {
     }
 };
 
+const getHighestOrder = data => {
+    let highest = -1;
+    data.forEach(note => {
+        console.log("current: ", note.order);
+        if (note.order > highest) highest = note.order;
+    });
+    console.log("highest", highest);
+    return highest;
+};
+
 const Notes = () => {
     /**
      * Local state
@@ -63,7 +73,10 @@ const Notes = () => {
     const handleContentChange = event =>
         setSelectedNote({ ...selectedNote, content: event.target.value });
 
-    const handleNewNote = () => createNoteMutation({ variables: { content: "", title: "" } });
+    const handleNewNote = () =>
+        createNoteMutation({
+            variables: { content: "", title: "", order: getHighestOrder(data.getNotes) + 1 }
+        });
 
     const handleDelete = id => deleteNoteMutation({ variables: { id } });
 

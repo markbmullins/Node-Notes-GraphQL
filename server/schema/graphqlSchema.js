@@ -16,8 +16,8 @@ const schema = buildSchema(`
       type Mutation {
           createNote(title: String, content: String, order: Int): Note
           updateNote(id: ID!, title: String, content: String, order: Int): Note
-          deleteNote(id: ID!): ID,
-          deleteNotes(ids: [ID]!): [Boolean]
+          deleteNote(id: ID!): Note,
+          deleteNotes(ids: [ID]!): [Note]
       }
   `);
 

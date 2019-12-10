@@ -1,24 +1,14 @@
 const noteService = require("../../service/noteService");
 
-const getNotes = () => {
-    return noteService.getAll();
-};
+const getNotes = () => noteService.getAll();
 
-const getNote = ({ id }) => {
-    return noteService.getByID(id);
-};
+const getNote = ({ id }) => noteService.getByID(id);
 
-const createNote = async params => {
-    return await noteService.create(params);
-};
+const createNote = async params => await noteService.create(params);
 
-const updateNote = async params => {
-    return await noteService.update(params);
-};
+const updateNote = async params => await noteService.update(params);
 
-const deleteNote = async ({ id }) => {
-    return await noteService.deleteById(id);
-};
+const deleteNote = async ({ id }) => await noteService.deleteById(id);
 
 module.exports = {
     getNotes,
