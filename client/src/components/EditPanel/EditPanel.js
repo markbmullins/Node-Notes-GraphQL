@@ -3,10 +3,10 @@ import React from "react";
 const EditPanel = ({ selectedNote, onSubmit, onTitleChange, onContentChange }) => {
     return (
         <div className="margin-small">
-            <form onSubmit={onSubmit} id="notes-form">
+            <form id="notes-form">
                 <div>
                     <label>
-                        <div className="title underlined">Name: </div>
+                        <div className="title underlined">Name </div>
                         <input
                             type="text"
                             value={selectedNote.title || ""}
@@ -18,7 +18,7 @@ const EditPanel = ({ selectedNote, onSubmit, onTitleChange, onContentChange }) =
                 </div>
                 <div className="margin-top">
                     <label>
-                        <div className="title underlined">Content: </div>
+                        <div className="title underlined">Content </div>
                         <textarea
                             spellCheck="false"
                             onChange={onContentChange}
@@ -27,9 +27,6 @@ const EditPanel = ({ selectedNote, onSubmit, onTitleChange, onContentChange }) =
                             onBlur={onSubmit}
                         />
                     </label>
-                </div>
-                <div>
-                    <input type="submit" value="Save Note" />
                 </div>
             </form>
         </div>

@@ -10,9 +10,9 @@ import EditPanel from "../EditPanel/EditPanel";
  *  Sorts an array of notes by their order property
  * @param {Array} data an array of notes
  */
-const sortByOrder = data => {
+const sortByOrder = (data, reverse = false) => {
     if (data && Array.isArray(data) && data.length !== 0) {
-        data.sort((a, b) => (a.order > b.order ? 1 : -1));
+        data.sort((a, b) => (a.order > b.order && !reverse ? 1 : -1));
     }
 };
 
@@ -72,7 +72,7 @@ const Notes = () => {
      * by the filter function.
      * @param {Object} cache A reference to the Apollo Cache object
      * @param {Object} note The note that is being added, updated or removed from cache.
-     * @param {Object} filterFunction The function to apply to the list of notes from cache. 
+     * @param {Object} filterFunction The function to apply to the list of notes from cache.
      */
     const updateCache = (cache, note, filterFunction) => {
         const { getNotes: notes } = cache.readQuery({ query: GET_NOTES });
@@ -102,17 +102,15 @@ const Notes = () => {
 
     /**
      * Handles the title change event
-     * @param {Event} e change event emitted from the input element 
+     * @param {Event} e change event emitted from the input element
      */
-    const handleTitleChange = e =>
-        setSelectedNote({ ...selectedNote, title: e.target.value });
+    const handleTitleChange = e => setSelectedNote({ ...selectedNote, title: e.target.value });
 
     /**
      * Handles the content change event
      * @param {Event} e change event emitted from the textarea element
      */
-    const handleContentChange = e =>
-        setSelectedNote({ ...selectedNote, content: e.target.value });
+    const handleContentChange = e => setSelectedNote({ ...selectedNote, content: e.target.value });
 
     const handleNewNote = () =>
         createNoteMutation({
@@ -135,8 +133,8 @@ const Notes = () => {
             title: selectedNote.title
         };
 
-        // Note should have an id because new note 
-        // function stores a blank note in the DB 
+        // Note should have an id because new note
+        // function stores a blank note in the DB
         if (selectedNote.id) {
             updateNoteMutation({
                 variables: {
